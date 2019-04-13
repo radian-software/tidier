@@ -8,6 +8,7 @@ import sys
 import textwrap
 
 import github
+import requests
 
 NotSet = object()
 
@@ -56,6 +57,12 @@ def get_issue_repo_name(issue):
     return match.group(1)
 
 
+def normalize_boolean(value):
+    if value == "0" or "no".startswith(value.lower()):
+        return ""
+    return value
+
+
 token = get_environ_var("TIDIER_ACCESS_TOKEN").strip()
 label = get_environ_var("TIDIER_LABEL", default="waiting on response")
 include = get_environ_var("TIDIER_INCLUDE_REPOS", default=".*")
@@ -64,6 +71,7 @@ num_days = get_environ_var("TIDIER_NUM_DAYS", default="90")
 comment_format = get_environ_var(
     "TIDIER_COMMENT_FORMAT", default=DEFAULT_COMMENT_FORMAT)
 for_real = get_environ_var("TIDIER_FOR_REAL", default="")
+webhook = get_environ_var("TIDIER_WEBHOOK", default="")
 
 try:
     num_days = int(num_days)
@@ -73,8 +81,8 @@ except ValueError:
 if num_days < 0:
     die("number of days is negative: {}".format(num_days))
 
-if for_real == "0" or "no".startswith(for_real.lower()):
-    for_real = ""
+for_real = normalize_boolean(for_real)
+webhook = normalize_boolean(webhook)
 
 if not re.fullmatch(r'[^"]+', label):
     die("unacceptable label name: {}".format(label))
@@ -97,6 +105,8 @@ print("  include regex: {}".format(include))
 print("  exclude regex: {}".format(exclude))
 print("  number of days before closing: {}".format(num_days))
 print("  for real: {}".format("yes" if for_real else "no"))
+print("  webhook: {}{}".format(
+    webhook or "(none)", "(disabled)" if webhook and not for_real else ""))
 print("  comment text:")
 print(textwrap.indent(textwrap.fill(comment_text), " " * 4))
 print()
@@ -171,5 +181,10 @@ for repo_name, issues in issues_by_repo.items():
         else:
             print("      Not closing: {} days since last activity"
                   .format(how_old.days))
+
+if webhook:
+    print()
+    print("Webhook")
+    print("  {}".format(requests.get(webhook)))
 
 done()
