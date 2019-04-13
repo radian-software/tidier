@@ -106,7 +106,7 @@ print("  exclude regex: {}".format(exclude))
 print("  number of days before closing: {}".format(num_days))
 print("  for real: {}".format("yes" if for_real else "no"))
 print("  webhook: {}{}".format(
-    webhook or "(none)", "(disabled)" if webhook and not for_real else ""))
+    webhook or "(none)", " (disabled)" if webhook and not for_real else ""))
 print("  comment text:")
 print(textwrap.indent(textwrap.fill(comment_text), " " * 4))
 print()
@@ -184,7 +184,10 @@ for repo_name, issues in issues_by_repo.items():
 
 if webhook:
     print()
-    print("Webhook")
-    print("  {}".format(requests.get(webhook)))
+    print("Webhook {}".format(webhook))
+    if for_real:
+        print("  {}".format(requests.get(webhook)))
+    else:
+        print("  Skipping")
 
 done()
