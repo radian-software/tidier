@@ -87,7 +87,7 @@ print("Configuration")
 print("  label: {}".format(label))
 print("  include regex: {}".format(include))
 print("  exclude regex: {}".format(exclude))
-print("  number of days: {}".format(num_days))
+print("  number of days before closing: {}".format(num_days))
 print("  for real: {}".format("yes" if for_real else "no"))
 print("  comment text:")
 print(textwrap.indent(textwrap.fill(comment_text), " " * 4))
@@ -106,7 +106,6 @@ all_issues = list(g.search_issues('label:"{}" state:open'.format(label)))
 all_issues_by_repo = collections.defaultdict(list)
 for issue in all_issues:
     all_issues_by_repo[get_issue_repo_name(issue)].append(issue)
-print()
 
 print("Retrieve list of repositories to which you have access")
 you = g.get_user()
@@ -120,15 +119,17 @@ for repo_name, issues in all_issues_by_repo.items():
     if repo_name not in your_repo_names:
         continue
     print("  Repository {}".format(repo_name))
-    match = (
-        re.fullmatch(include, repo_name) and
-        not re.fullmatch(exclude, repo_name) and
-        issues[0].repository.has_in_collaborators(your_username))
-    if match:
-        print("    Including: you are a collaborator")
-        issues_by_repo[repo_name] = issues
-    else:
-        print("    Not including: you are not a collaborator")
+    if not re.fullmatch(include, repo_name):
+        print("    Excluding: does not match include regex")
+        continue
+    if re.fullmatch(exclude, repo_name):
+        print("    Excluding: matches exclude regex")
+        continue
+    if not issues[0].repository.has_in_collaborators(your_username):
+        print("    Excluding: you are not a collaborator")
+        continue
+    print("--> Including: all checks passed")
+    issues_by_repo[repo_name] = issues
 print()
 
 print("Process issues and pull requests")
@@ -142,14 +143,14 @@ for repo_name, issues in issues_by_repo.items():
             if for_real:
                 print("      Closing: {} days since last activity")
                 assert False  # just in case
-                # Do this first because it's possible that we can
-                # comment but not edit, if the code above doesn't do a
-                # good job of filtering out repositories where we
+                # Close the issue first because it's possible that we
+                # can comment but not close, if the code above doesn't
+                # do a good job of filtering out repositories where we
                 # aren't collaborators.
                 issue.edit(state="closed")
                 issue.create_comment(comment_text)
             else:
-                print("      Would close: {} days since last activity"
+                print("----> Would close: {} days since last activity"
                       .format(how_old.days))
         else:
             print("      Not closing: {} days since last activity"
