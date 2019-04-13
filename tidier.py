@@ -2,7 +2,6 @@
 
 import collections
 import datetime
-import itertools
 import os
 import re
 import sys
@@ -16,8 +15,8 @@ DEFAULT_COMMENT_FORMAT = """\
 This thread is being closed automatically by \
 [Tidier](https://github.com/raxod502/tidier) because it is labeled with \
 "{label}" and has not seen any activity for {num_days} days. But don't \
-worry -- if you have any information that might advance the discussion, \
-leave a comment and the thread may be reopened.\
+worry—if you have any information that might advance the discussion, \
+leave a comment and the thread may be reopened :)\
 """
 
 
@@ -27,6 +26,15 @@ def die(message):
     """
     print("tidier: " + message, file=sys.stderr)
     sys.exit(1)
+
+
+def done():
+    """
+    Print newline and "Done!" to stdout and exit with success.
+    """
+    print()
+    print("Done!")
+    sys.exit(0)
 
 
 def get_environ_var(name, default=NotSet):
@@ -99,9 +107,13 @@ print("Timestamp")
 print("  {} UTC".format(now))
 print()
 
-print('Search for issues for label "{}"'.format(label))
+print('Search for open issues for label "{}"'.format(label))
 g = github.Github(token)
 all_issues = list(g.search_issues('label:"{}" state:open'.format(label)))
+
+if not all_issues:
+    print("  No issues found")
+    done()
 
 all_issues_by_repo = collections.defaultdict(list)
 for issue in all_issues:
@@ -111,8 +123,12 @@ print("Retrieve list of repositories to which you have access")
 you = g.get_user()
 your_username = you.login
 your_repo_names = {repo.full_name for repo in you.get_repos()}
-print()
 
+if not your_repo_names:
+    print("  No repositories found")
+    done()
+
+print()
 print("Check your permissions on the repositories")
 issues_by_repo = {}
 for repo_name, issues in all_issues_by_repo.items():
@@ -141,7 +157,8 @@ for repo_name, issues in issues_by_repo.items():
         how_old = now - issue.updated_at
         if how_old.days >= num_days:
             if for_real:
-                print("      Closing: {} days since last activity")
+                print("      Closing: {} days since last activity"
+                      .format(how_old.days))
                 # Close the issue first because it's possible that we
                 # can comment but not close, if the code above doesn't
                 # do a good job of filtering out repositories where we
@@ -154,6 +171,5 @@ for repo_name, issues in issues_by_repo.items():
         else:
             print("      Not closing: {} days since last activity"
                   .format(how_old.days))
-print()
 
-print("Done!")
+done()
