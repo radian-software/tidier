@@ -142,7 +142,6 @@ for repo_name, issues in issues_by_repo.items():
         if how_old.days >= num_days:
             if for_real:
                 print("      Closing: {} days since last activity")
-                assert False  # just in case
                 # Close the issue first because it's possible that we
                 # can comment but not close, if the code above doesn't
                 # do a good job of filtering out repositories where we
