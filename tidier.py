@@ -51,7 +51,8 @@ def get_environ_var(name, default=NotSet):
 
 def get_issue_repo_name(issue):
     match = re.fullmatch(
-        r"https://api.github.com/repos/([^/]+/[^/]+)/issues/[0-9]+", issue.url)
+        r"https://api.github.com/repos/([^/]+/[^/]+)/issues/[0-9]+", issue.url
+    )
     if not match:
         die("unexpected error response from GitHub API")
     return match.group(1)
@@ -69,7 +70,8 @@ include = get_environ_var("TIDIER_INCLUDE_REPOS", default=".*")
 exclude = get_environ_var("TIDIER_EXCLUDE_REPOS", default="(?!)")
 num_days = get_environ_var("TIDIER_NUM_DAYS", default="90")
 comment_format = get_environ_var(
-    "TIDIER_COMMENT_FORMAT", default=DEFAULT_COMMENT_FORMAT)
+    "TIDIER_COMMENT_FORMAT", default=DEFAULT_COMMENT_FORMAT
+)
 for_real = get_environ_var("TIDIER_FOR_REAL", default="")
 webhook = get_environ_var("TIDIER_WEBHOOK", default="")
 
@@ -105,8 +107,11 @@ print("  include regex: {}".format(include))
 print("  exclude regex: {}".format(exclude))
 print("  number of days before closing: {}".format(num_days))
 print("  for real: {}".format("yes" if for_real else "no"))
-print("  webhook: {}{}".format(
-    webhook or "(none)", " (disabled)" if webhook and not for_real else ""))
+print(
+    "  webhook: {}{}".format(
+        webhook or "(none)", " (disabled)" if webhook and not for_real else ""
+    )
+)
 print("  comment text:")
 print(textwrap.indent(textwrap.fill(comment_text), " " * 4))
 print()
@@ -167,8 +172,7 @@ for repo_name, issues in issues_by_repo.items():
         how_old = now - issue.updated_at
         if how_old.days >= num_days:
             if for_real:
-                print("      Closing: {} days since last activity"
-                      .format(how_old.days))
+                print("      Closing: {} days since last activity".format(how_old.days))
                 # Close the issue first because it's possible that we
                 # can comment but not close, if the code above doesn't
                 # do a good job of filtering out repositories where we
@@ -176,11 +180,13 @@ for repo_name, issues in issues_by_repo.items():
                 issue.edit(state="closed")
                 issue.create_comment(comment_text)
             else:
-                print("----> Would close: {} days since last activity"
-                      .format(how_old.days))
+                print(
+                    "----> Would close: {} days since last activity".format(
+                        how_old.days
+                    )
+                )
         else:
-            print("      Not closing: {} days since last activity"
-                  .format(how_old.days))
+            print("      Not closing: {} days since last activity".format(how_old.days))
 
 if webhook:
     print()
