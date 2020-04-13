@@ -17,7 +17,7 @@ This thread is being closed automatically by \
 [Tidier](https://github.com/raxod502/tidier) because it is labeled with \
 "{label}" and has not seen any activity for {num_days} days. But don't \
 worry—if you have any information that might advance the discussion, \
-leave a comment and the thread may be reopened :)\
+leave a comment and I will be happy to reopen the thread :)\
 """
 
 
