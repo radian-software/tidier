@@ -122,7 +122,7 @@ print("Timestamp")
 print("  {} UTC".format(now))
 print()
 
-print('Search for issues for label "{}"'.format(label))
+print('Search for issues with label "{}"'.format(label))
 g = github.Github(token)
 all_issues = list(g.search_issues('label:"{}"'.format(label)))
 
