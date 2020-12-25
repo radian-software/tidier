@@ -122,9 +122,9 @@ print("Timestamp")
 print("  {} UTC".format(now))
 print()
 
-print('Search for open issues for label "{}"'.format(label))
+print('Search for issues for label "{}"'.format(label))
 g = github.Github(token)
-all_issues = list(g.search_issues('label:"{}" state:open'.format(label)))
+all_issues = list(g.search_issues('label:"{}"'.format(label)))
 
 if not all_issues:
     print("  No issues found")
@@ -169,24 +169,40 @@ for repo_name, issues in issues_by_repo.items():
     for issue in issues:
         issue_type = "Pull request" if issue.pull_request else "Issue"
         print("    {} #{}: {}".format(issue_type, issue.number, issue.title))
-        how_old = now - issue.updated_at
-        if how_old.days >= num_days:
-            if for_real:
-                print("      Closing: {} days since last activity".format(how_old.days))
-                # Close the issue first because it's possible that we
-                # can comment but not close, if the code above doesn't
-                # do a good job of filtering out repositories where we
-                # aren't collaborators.
-                issue.edit(state="closed")
-                issue.create_comment(comment_text)
+        if issue.state == "open":
+            how_old = now - issue.updated_at
+            if how_old.days >= num_days:
+                if for_real:
+                    print(
+                        "      Closing: {} days since last activity".format(
+                            how_old.days
+                        )
+                    )
+                    # Close the issue first because it's possible that we
+                    # can comment but not close, if the code above doesn't
+                    # do a good job of filtering out repositories where we
+                    # aren't collaborators.
+                    issue.edit(state="closed")
+                    issue.create_comment(comment_text)
+                    issue.remove_from_labels(label)
+                else:
+                    print(
+                        "----> Would close: {} days since last activity".format(
+                            how_old.days
+                        )
+                    )
             else:
                 print(
-                    "----> Would close: {} days since last activity".format(
+                    "      Not closing: {} days since last activity".format(
                         how_old.days
                     )
                 )
         else:
-            print("      Not closing: {} days since last activity".format(how_old.days))
+            if for_real:
+                print("      Removing label: already closed")
+                issue.remove_from_labels(label)
+            else:
+                print("----> Would remove label: already closed")
 
 if webhook:
     print()
