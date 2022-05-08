@@ -47,7 +47,7 @@ The default `TIDIER_COMMENT_FORMAT` (with newlines added for
 readability) is:
 
     This thread is being closed automatically by
-    [Tidier](https://github.com/raxod502/tidier) because it is labeled with
+    [Tidier](https://github.com/radian-software/tidier) because it is labeled with
     "{label}" and has not seen any activity for {num_days} days. But don't
     worry—if you have any information that might advance the discussion,
     leave a comment and the thread may be reopened :)
@@ -97,4 +97,4 @@ repositories. Hence this project, which replaces it entirely.
 [pipenv]: https://pipenv.readthedocs.io/en/latest/
 [scala]: https://www.scala-lang.org/
 [scheduler]: https://devcenter.heroku.com/articles/scheduler
-[tidier-build]: https://github.com/raxod502/tidier/blob/b69dd894301bf532d8849fa5cc2ffe73abb40cae/Pipfile
+[tidier-build]: https://github.com/radian-software/tidier/blob/b69dd894301bf532d8849fa5cc2ffe73abb40cae/Pipfile
