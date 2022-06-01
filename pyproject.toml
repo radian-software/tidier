@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "tidier"
+version = "0.1.0"
+description = ""
+authors = ["Radon Rosborough <radon.neon@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.27.1"
+PyGithub = "^1.55"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
