@@ -12,9 +12,8 @@ issues ahead of time.
 This is a standard Python app. [Install the dependencies][pipenv] in
 `Pipfile.lock`, then run `tidier.py`. You will probably want to do
 this in a [cron job][cron] or something similar. I would recommend
-creating a free [Heroku] app and installing the [Scheduler] addon.
-Then you can set Tidier's environment variables (see below) as [Config
-Vars][config-vars].
+creating a free [Railway] app. Then you can set Tidier's environment
+variables (see below) as variables.
 
 ## Configuration
 
@@ -83,11 +82,9 @@ customizing the comment format (see [open
 issue][no-carrier-comment-format]) or iterating over all your
 repositories. Hence this project, which replaces it entirely.
 
-[config-vars]: https://devcenter.heroku.com/articles/config-vars
 [cron]: https://en.wikipedia.org/wiki/Cron
 [dms]: https://deadmanssnitch.com/
 [github-api]: https://developer.github.com/v3/
-[heroku]: https://www.heroku.com/
 [markdown]: https://guides.github.com/features/mastering-markdown/
 [no-carrier]: https://github.com/twbs/no-carrier
 [no-carrier-build-1]: https://github.com/twbs/no-carrier/blob/502932181d5c2573d7ffece50d18a788f63b8693/build.sbt
@@ -95,6 +92,6 @@ repositories. Hence this project, which replaces it entirely.
 [no-carrier-build-3]: https://github.com/twbs/no-carrier/blob/502932181d5c2573d7ffece50d18a788f63b8693/project/plugins.sbt
 [no-carrier-comment-format]: https://github.com/twbs/no-carrier/issues/22
 [pipenv]: https://pipenv.readthedocs.io/en/latest/
+[railway]: https://railway.app/
 [scala]: https://www.scala-lang.org/
-[scheduler]: https://devcenter.heroku.com/articles/scheduler
 [tidier-build]: https://github.com/radian-software/tidier/blob/b69dd894301bf532d8849fa5cc2ffe73abb40cae/Pipfile
