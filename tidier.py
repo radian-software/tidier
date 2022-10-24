@@ -38,7 +38,7 @@ def done():
     sys.exit(0)
 
 
-def get_environ_var(name, default=NotSet):
+def get_environ_var(name, default=NotSet) -> str:
     """
     Get value of environment variable with given name. If not set,
     return default. If default is not given, then die and ask the user
@@ -46,7 +46,7 @@ def get_environ_var(name, default=NotSet):
     """
     if name not in os.environ and default is NotSet:
         die("you must set ${}".format(name))
-    return os.environ.get(name, default)
+    return os.environ.get(name, default)  # type: ignore
 
 
 def get_issue_repo_name(issue):
