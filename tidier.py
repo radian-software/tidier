@@ -156,9 +156,6 @@ for repo_name, issues in all_issues_by_repo.items():
     if re.fullmatch(exclude, repo_name):
         print("    Excluding: matches exclude regex")
         continue
-    if not issues[0].repository.has_in_collaborators(your_username):
-        print("    Excluding: you are not a collaborator")
-        continue
     print("--> Including: all checks passed")
     issues_by_repo[repo_name] = issues
 print()
