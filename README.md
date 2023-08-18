@@ -9,11 +9,11 @@ issues ahead of time.
 
 ## Usage
 
-This is a standard Python app. [Install the dependencies][pipenv] in
-`Pipfile.lock`, then run `tidier.py`. You will probably want to do
-this in a [cron job][cron] or something similar. I would recommend
-creating a free [Railway] app. Then you can set Tidier's environment
-variables (see below) as variables.
+This is a standard Python app. [Install the dependencies][poetry] in
+`poetry.lock`, then run `tidier.py`. You will probably want to do this
+in a [cron job][cron] or something similar. I would recommend creating
+a free [Railway] app. Then you can set Tidier's environment variables
+(see below) as variables.
 
 ## Configuration
 
@@ -91,7 +91,7 @@ repositories. Hence this project, which replaces it entirely.
 [no-carrier-build-2]: https://github.com/twbs/no-carrier/blob/502932181d5c2573d7ffece50d18a788f63b8693/project/build.properties
 [no-carrier-build-3]: https://github.com/twbs/no-carrier/blob/502932181d5c2573d7ffece50d18a788f63b8693/project/plugins.sbt
 [no-carrier-comment-format]: https://github.com/twbs/no-carrier/issues/22
-[pipenv]: https://pipenv.readthedocs.io/en/latest/
+[poetry]: https://python-poetry.org/
 [railway]: https://railway.app/
 [scala]: https://www.scala-lang.org/
-[tidier-build]: https://github.com/radian-software/tidier/blob/b69dd894301bf532d8849fa5cc2ffe73abb40cae/Pipfile
+[tidier-build]: https://github.com/radian-software/tidier/blob/645c709d721d5703d06be760dd2526980a5da1e2/pyproject.toml
