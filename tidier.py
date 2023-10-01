@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 
 import collections
-import datetime
+from datetime import datetime, timezone
 import os
 import re
 import sys
 import textwrap
 
+import dotenv
 import github
 import requests
+
+dotenv.load_dotenv()
 
 NotSet = object()
 
@@ -116,10 +119,10 @@ print("  comment text:")
 print(textwrap.indent(textwrap.fill(comment_text), " " * 4))
 print()
 
-now = datetime.datetime.utcnow()
+now = datetime.now(timezone.utc)
 
 print("Timestamp")
-print("  {} UTC".format(now))
+print("  {}".format(now))
 print()
 
 print('Search for issues with label "{}"'.format(label))
