@@ -2,6 +2,7 @@
 
 import collections
 from datetime import datetime, timezone
+import functools
 import os
 import re
 import sys
@@ -9,6 +10,9 @@ import textwrap
 
 import dotenv
 import github
+import gql
+from gql import gql as GraphQLQuery
+from gql.transport.requests import RequestsHTTPTransport
 import requests
 
 dotenv.load_dotenv()
@@ -65,6 +69,67 @@ def normalize_boolean(value):
     if value == "0" or "no".startswith(value.lower()):
         return ""
     return value
+
+
+@functools.cache
+def get_graphql_client(token: str):
+    return gql.Client(
+        transport=RequestsHTTPTransport(
+            url="https://api.github.com/graphql",
+            headers={"Authorization": f"Bearer {token}"},
+        ),
+    )
+
+
+@functools.cache
+def get_graphql_issue_id(client: gql.Client, owner: str, repo: str, number: int):
+    return client.execute(
+        GraphQLQuery(
+            """
+query($owner: String!, $repo: String!, $number: Int!) {
+  repository(owner: $owner, name: $repo) {
+    issueOrPullRequest(number: $number) {
+      ... on Issue {
+        id
+      }
+      ... on PullRequest {
+        id
+      }
+    }
+  }
+}
+    """
+        ),
+        variable_values={
+            "owner": owner,
+            "repo": repo,
+            "number": number,
+        },
+    )["repository"]["issueOrPullRequest"]["id"]
+
+
+def close_issue(client: gql.Client, graphql_issue_id: str):
+    """
+    Close the issue with the given internal ID returned from
+    get_graphql_issue_id. Why use this method instead of the REST API?
+    Because only with the GraphQL API is it possible to close an issue
+    when having only triage permission on the repository. This makes
+    zero sense but is just a documented bug in the REST API.
+    """
+    client.execute(
+        GraphQLQuery(
+            """
+mutation($id: ID!) {
+  closeIssue(input: {issueId: $id, stateReason: NOT_PLANNED}) {
+    clientMutationId
+  }
+}
+        """
+        ),
+        variable_values={
+            "id": graphql_issue_id,
+        },
+    )
 
 
 token = get_environ_var("TIDIER_ACCESS_TOKEN").strip()
@@ -125,6 +190,8 @@ print("Timestamp")
 print("  {}".format(now))
 print()
 
+graphql_client = get_graphql_client(token)
+
 print('Search for issues with label "{}"'.format(label))
 g = github.Github(token)
 all_issues = list(g.search_issues('label:"{}"'.format(label)))
@@ -182,7 +249,15 @@ for repo_name, issues in issues_by_repo.items():
                     # can comment but not close, if the code above doesn't
                     # do a good job of filtering out repositories where we
                     # aren't collaborators.
-                    issue.edit(state="closed")
+                    close_issue(
+                        graphql_client,
+                        get_graphql_issue_id(
+                            graphql_client,
+                            issue.repository.owner.login,
+                            issue.repository.name,
+                            issue.number,
+                        ),
+                    )
                     issue.create_comment(comment_text)
                     issue.remove_from_labels(label)
                 else:
