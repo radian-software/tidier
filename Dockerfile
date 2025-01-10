@@ -1,15 +1,16 @@
 # EOL: April 2027
 FROM ubuntu:22.04
 
-RUN apt-get update && apt-get install -y curl python3 python3-pip tini && rm -rf /var/lib/apt/lists/*
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH=/root/.local/bin:$PATH
-ENV POETRY_VIRTUALENVS_CREATE=false
+RUN apt-get update && apt-get install -y curl python3-pip python3-venv tini && rm -rf /var/lib/apt/lists/*
+RUN pip3 install "poetry>=1.7,<1.8"
 
-WORKDIR /src
+RUN python3 -m venv /venv
+ENV VIRTUAL_ENV=/venv
+ENV PATH=/venv/bin:$PATH
 
 COPY pyproject.toml poetry.lock /src/
-RUN poetry install
+WORKDIR /src
+RUN poetry install --no-root
 
 COPY cron.py tidier.py /src/
 
